@@ -1,0 +1,24 @@
+[Unit]
+Description=Nextjs HTTP Server for <%= "#{fetch(:application)} #{fetch(:nextjs_current_process)} (#{fetch(:stage)})" %>
+After=syslog.target network.target
+
+[Service]
+Type=simple
+WorkingDirectory=<%= File.join(fetch(:deploy_to), 'current') %>
+
+ExecStart=<%= File.join(fetch(:deploy_to), 'current') %>/bin/nextjs <%= args.compact.join(' ') %>
+ExecReload=/bin/kill -TSTP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+
+StandardOutput=append:<%= fetch_nextjs_access_log %>
+StandardError=append:<%= fetch_nextjs_error_log %>
+
+Environment=PATH=/home/deploy/.rbenv/shims:/usr/local/bin:/usr/bin:/bin
+Environment=MALLOC_ARENA_MAX=2
+
+Restart=always
+
+SyslogIdentifier=<%= fetch(:nextjs_current_process) %>
+
+[Install]
+WantedBy=multi-user.target
