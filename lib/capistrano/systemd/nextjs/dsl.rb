@@ -35,6 +35,7 @@ module Capistrano
 
         def compiled_systemd_template(process_name)
           args = []
+          args.push "--cwd #{File.join(fetch(:deploy_to), 'current')}"
 
           search_paths = [
             File.expand_path(
